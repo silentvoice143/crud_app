@@ -1,3 +1,6 @@
+
+## crud app
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
@@ -32,6 +35,18 @@
 $ npm install
 ```
 
+create an .env file having all these element
+
+```bash
+DB_PASSWORD=''
+DB_USERNAME=root
+DB_NAME=demo
+HOST=localhost
+PORT=3306
+DB_TYPE=mysql
+SECRET_KEY=IlovethisthingIamdoingnow
+```
+
 ## Running the app
 
 ```bash
@@ -41,8 +56,6 @@ $ npm run start
 # watch mode
 $ npm run start:dev
 
-# production mode
-$ npm run start:prod
 ```
 
 ## Test
@@ -51,11 +64,7 @@ $ npm run start:prod
 # unit tests
 $ npm run test
 
-# e2e tests
-$ npm run test:e2e
 
-# test coverage
-$ npm run test:cov
 ```
 
 ## Support
@@ -71,3 +80,144 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
+
+# Auth Controller
+
+The `AuthController` provides endpoints for user authentication.
+
+## Endpoints
+
+### Register User
+
+Registers a new user.
+
+- **URL**: `POST /auth/register`
+
+#### Request Body
+- `username` (string, required): The username of the user.
+- `email` (string, required): The email address of the user.
+- `password` (string, required): The password of the user.
+
+#### Response
+- `200 OK`: User registered successfully.
+- `400 Bad Request`: Invalid request body.
+
+#### Example
+```http
+POST /auth/register
+
+
+{
+  "username": "example_user",
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+### User Login
+
+Logs in a user.
+
+- **URL**: `POST /auth/login`
+
+#### Request Body
+- `username` (string, required): The username of the user.
+- `password` (string, required): The password of the user.
+
+#### Response
+- `200 OK`: User logged in successfully. Returns a JWT token.
+- `400 Bad Request`: Invalid request body or credentials.
+- `404 Not Found`: User not found.
+
+#### Example
+```http
+POST /auth/login
+
+
+{
+  "username": "example_user",
+  "password": "password123"
+}
+```
+
+
+# User Controller
+
+The `UserController` provides endpoints for managing users.
+
+## Endpoints
+
+### Get All Users
+
+Retrieves a list of all users.
+
+- **URL**: `GET /user`
+
+#### Response
+- `200 OK`: Returns a list of all users.
+
+#### Example
+```http
+GET /user
+```
+
+### Get User by ID
+
+Retrieves a specific user by ID.
+
+- **URL**: `GET /user/:id`
+
+#### Path Parameters
+- `id` (string, required): The ID of the user to retrieve.
+
+#### Response
+- `200 OK`: Returns the user with the specified ID.
+- `404 Not Found`: User not found.
+
+#### Example
+```http
+GET /user/123
+```
+
+### Update User
+
+Updates a user's information.
+
+- **URL**: `PATCH /user/:id`
+
+#### Path Parameters
+- `id` (string, required): The ID of the user to update.
+
+#### Request Body
+- `updateUserDto` (object, required): The updated user data.
+
+#### Response
+- `200 OK`: Returns the updated user data.
+- `404 Not Found`: User not found.
+
+#### Example
+```http
+PATCH /user/123
+
+{
+"username": "new_username"
+}
+```
+
+### Delete User
+
+Deletes a user.
+
+- **URL**: `DELETE /user/:id`
+
+#### Path Parameters
+- `id` (string, required): The ID of the user to delete.
+
+#### Response
+- `204 No Content`: User successfully deleted.
+- `404 Not Found`: User not found.
+
+#### Example
+```http
+DELETE /user/123
+```
