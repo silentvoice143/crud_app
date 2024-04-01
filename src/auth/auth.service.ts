@@ -20,7 +20,10 @@ export class AuthService {
     const user = this.userRepository.create(userData);
     // console.log(user);
     await this.userRepository.save(user);
-    return "user registered successfully";
+    return {
+      status: 200,
+      message: "User registered successfully",
+    };
   }
 
   async login(userData) {
@@ -31,17 +34,27 @@ export class AuthService {
     });
 
     if (!user) {
-      return "user not found";
+      return {
+        status: 404,
+        message: "User not found",
+      };
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return "password incorrect";
+      return {
+        status: 404,
+        message: "Invalid user",
+      };
     }
     delete user.password;
-    const token = this.generateToken(user);
-    return token;
+    const token = await this.generateToken(user);
+    return {
+      status: 200,
+      message: "User logged in successfully",
+      token: token,
+    };
   }
 
   async generateToken(user) {

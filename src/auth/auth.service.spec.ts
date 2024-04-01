@@ -61,29 +61,64 @@ describe("AuthService", () => {
       // expect(bcrypt.hash).toHaveBeenCalledWith(mockUserData.password, 10);
       expect(userRepository.create).toHaveBeenCalledWith(mockUserData);
       expect(userRepository.save).toHaveBeenCalledWith(mockUser);
-      expect(result).toBe("user registered successfully");
+      expect(result).toStrictEqual({
+        status: 200,
+        message: "User registered successfully",
+      });
     });
   });
 
   describe("login", () => {
     it("should return token if login is successful", async () => {
       // Mock bcrypt.compare
-      const mockPassword = "test_password";
-      const mockUser = new User();
-      mockUser.password = await bcrypt.hash(mockPassword, 10);
+      const mockPassword = "hashed_satyam_password"; // Use hashed password here
+      const mockUser = {
+        id: 1,
+        username: "satyam",
+        email: "jhdkj@gmail.com",
+        password: "hashed_satyam_password", // Use hashed password here
+      };
+      const mockToken = "jdfhkjdfkljfjdhkjfhdk";
+
+      jest
+        .spyOn(bcrypt, "compare")
+        .mockImplementation((password: string, userpassword: string) => {
+          // Return a Promise that resolves to a boolean
+          return Promise.resolve(password === userpassword);
+        });
+
+      // jest
+      //   .spyOn(jwt, "sign")
+      //   .mockImplementation(
+      //     (
+      //       payload: { id: number; username: string; email: string },
+      //       secretOrPrivateKey: string,
+      //       options?: jwt.SignOptions,
+      //     ) => {
+      //       // Return a mock token
+      //       return mockToken;
+      //     },
+      //   );
+
+      jest.spyOn(jwt, "sign").mockReturnValue(mockToken); // Return token directly
+
       mockUserRepository.findOne.mockResolvedValue(mockUser);
 
       // Call the login method
       const result = await service.login({
         username: "test_user",
-        password: mockPassword,
+        password: mockPassword, // Pass hashed password here
       });
 
       // Assertions
       expect(userRepository.findOne).toHaveBeenCalledWith({
         where: { username: "test_user" },
       });
-      expect(result).toEqual(expect.any(String));
+      expect(result).toEqual({
+        status: 200,
+        message: "User logged in successfully",
+        token: mockToken,
+      });
     });
 
     it('should return "user not found" if user is not found', async () => {
@@ -100,7 +135,10 @@ describe("AuthService", () => {
       expect(userRepository.findOne).toHaveBeenCalledWith({
         where: { username: "nonexistent_user" },
       });
-      expect(result).toBe("user not found");
+      expect(result).toEqual({
+        status: 404,
+        message: "User not found",
+      });
     });
 
     it('should return "password incorrect" if password is incorrect', async () => {
@@ -119,7 +157,10 @@ describe("AuthService", () => {
       expect(userRepository.findOne).toHaveBeenCalledWith({
         where: { username: "test_user" },
       });
-      expect(result).toBe("password incorrect");
+      expect(result).toEqual({
+        status: 404,
+        message: "Invalid user",
+      });
     });
   });
 
